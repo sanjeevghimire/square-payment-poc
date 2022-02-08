@@ -1,11 +1,7 @@
-import React from 'react';
-import './App.css';
+import React from "react";
+import "./App.css";
 
-import { LoadScript } from './paymentForm'; 
-
-
-const applicationId=""
-const locationId=""
+import { LoadScript } from "./paymentForm";
 
 function App() {
   return (
@@ -15,7 +11,6 @@ function App() {
       <LoadScript />
     </div>
   );
- 
 }
 
 export default App;

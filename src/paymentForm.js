@@ -1,16 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useExternalScript } from "./hooks/useExternalScript";
 export const LoadScript = () => {
-  const squareScript =
-    "https://sandbox.web.squarecdn.com/v1/square.js";
+  const squareScript = "https://sandbox.web.squarecdn.com/v1/square.js";
   const status = useExternalScript(squareScript);
 
-  const appId = '{APPLICATION_ID}';
-  const locationId = '{LOCATION_ID}';
+  const appId = "sandbox-sq0idb-R8971G96EGzUVMRrCKx5XQ";
+  const locationId = "LX4848WDYD7JM";
 
   async function initializeCard(payments) {
     const card = await payments.card();
-    await card.attach('#card-container');
+    await card.attach("#card-container");
 
     return card;
   }
@@ -21,10 +20,10 @@ export const LoadScript = () => {
       sourceId: token,
     });
 
-    const paymentResponse = await fetch('/payment', {
-      method: 'POST',
+    const paymentResponse = await fetch("/payment", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body,
     });
@@ -39,14 +38,12 @@ export const LoadScript = () => {
 
   async function tokenize(paymentMethod) {
     const tokenResult = await paymentMethod.tokenize();
-    if (tokenResult.status === 'OK') {
+    if (tokenResult.status === "OK") {
       return tokenResult.token;
     } else {
       let errorMessage = `Tokenization failed with status: ${tokenResult.status}`;
       if (tokenResult.errors) {
-        errorMessage += ` and errors: ${JSON.stringify(
-          tokenResult.errors
-        )}`;
+        errorMessage += ` and errors: ${JSON.stringify(tokenResult.errors)}`;
       }
 
       throw new Error(errorMessage);
@@ -55,23 +52,21 @@ export const LoadScript = () => {
 
   // status is either SUCCESS or FAILURE;
   function displayPaymentResults(status) {
-    const statusContainer = document.getElementById(
-      'payment-status-container'
-    );
-    if (status === 'SUCCESS') {
-      statusContainer.classList.remove('is-failure');
-      statusContainer.classList.add('is-success');
+    const statusContainer = document.getElementById("payment-status-container");
+    if (status === "SUCCESS") {
+      statusContainer.classList.remove("is-failure");
+      statusContainer.classList.add("is-success");
     } else {
-      statusContainer.classList.remove('is-success');
-      statusContainer.classList.add('is-failure');
+      statusContainer.classList.remove("is-success");
+      statusContainer.classList.add("is-failure");
     }
 
-    statusContainer.style.visibility = 'visible';
+    statusContainer.style.visibility = "visible";
   }
 
-  document.addEventListener('DOMContentLoaded', async function () {
+  async function load() {
     if (!window.Square) {
-      throw new Error('Square.js failed to load properly');
+      throw new Error("Square.js failed to load properly");
     }
 
     let payments;
@@ -79,10 +74,10 @@ export const LoadScript = () => {
       payments = window.Square.payments(appId, locationId);
     } catch {
       const statusContainer = document.getElementById(
-        'payment-status-container'
+        "payment-status-container"
       );
-      statusContainer.className = 'missing-credentials';
-      statusContainer.style.visibility = 'visible';
+      statusContainer.className = "missing-credentials";
+      statusContainer.style.visibility = "visible";
       return;
     }
 
@@ -90,7 +85,7 @@ export const LoadScript = () => {
     try {
       card = await initializeCard(payments);
     } catch (e) {
-      console.error('Initializing Card failed', e);
+      console.error("Initializing Card failed", e);
       return;
     }
 
@@ -103,32 +98,38 @@ export const LoadScript = () => {
         cardButton.disabled = true;
         const token = await tokenize(paymentMethod);
         const paymentResults = await createPayment(token);
-        displayPaymentResults('SUCCESS');
+        displayPaymentResults("SUCCESS");
 
-        console.debug('Payment Success', paymentResults);
+        console.debug("Payment Success", paymentResults);
       } catch (e) {
         cardButton.disabled = false;
-        displayPaymentResults('FAILURE');
+        displayPaymentResults("FAILURE");
         console.error(e.message);
       }
     }
 
-    const cardButton = document.getElementById('card-button');
-    cardButton.addEventListener('click', async function (event) {
+    const cardButton = document.getElementById("card-button");
+    cardButton.addEventListener("click", async function (event) {
       await handlePaymentMethodSubmission(event, card);
     });
-  });
+  }
+
+  useEffect(() => {
+    load();
+  }, [status]);
 
   return (
     <div>
       {status === "loading" && <p>loading...</p>}
       {status === "ready" && (
         <>
-            <form id="payment-form">
-                <div id="card-container"></div>
-                <button id="card-button" type="button">Pay $1.00</button>
-            </form>
-            <div id="payment-status-container"></div>
+          <form id="payment-form">
+            <div id="card-container"></div>
+            <button id="card-button" type="button">
+              Pay $1.000
+            </button>
+          </form>
+          <div id="payment-status-container"></div>
         </>
       )}
     </div>
