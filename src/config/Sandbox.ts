@@ -1,0 +1,1 @@
+export const url:string = 'https://sandbox.web.squarecdn.com/v1/square.js'

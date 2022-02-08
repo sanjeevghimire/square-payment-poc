@@ -1,15 +1,12 @@
 import React from "react";
-import "./App.css";
 
-import { LoadScript } from "./paymentForm";
+import Form from "./pages/Form";
 
 function App() {
   return (
-    <div>
-      <div>Square Developer Offering</div>
-      <p>Payments API</p>
-      <LoadScript />
-    </div>
+    <>
+      <Form />
+    </>
   );
 }
 

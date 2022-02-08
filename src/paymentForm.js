@@ -1,16 +1,20 @@
-import React, { useEffect } from "react";
-import { useExternalScript } from "./hooks/useExternalScript";
-export const LoadScript = () => {
-  const squareScript = "https://sandbox.web.squarecdn.com/v1/square.js";
-  const status = useExternalScript(squareScript);
+import React, { useEffect, useState } from "react";
 
-  const appId = "sandbox-sq0idb-R8971G96EGzUVMRrCKx5XQ";
-  const locationId = "LX4848WDYD7JM";
+import { useExternalScript } from "./hooks/useExternalScript";
+import { appId, locationId } from "./config/Credentials";
+import { url } from "./config/Sandbox";
+
+export const LoadScript = () => {
+  const [token, setToken] = useState("");
+
+  //returns ready or loading
+  // const status = "ready";
+  const status = useExternalScript(url);
 
   async function initializeCard(payments) {
+    console.log("payments ", payments);
     const card = await payments.card();
     await card.attach("#card-container");
-
     return card;
   }
 
@@ -37,6 +41,7 @@ export const LoadScript = () => {
   }
 
   async function tokenize(paymentMethod) {
+    console.log("payment >>>", paymentMethod);
     const tokenResult = await paymentMethod.tokenize();
     if (tokenResult.status === "OK") {
       return tokenResult.token;
@@ -97,6 +102,8 @@ export const LoadScript = () => {
         // disable the submit button as we await tokenization and make a payment request.
         cardButton.disabled = true;
         const token = await tokenize(paymentMethod);
+        console.log("TOken >>>>>>>>>", token);
+        setToken(token);
         const paymentResults = await createPayment(token);
         displayPaymentResults("SUCCESS");
 
@@ -123,6 +130,7 @@ export const LoadScript = () => {
       {status === "loading" && <p>loading...</p>}
       {status === "ready" && (
         <>
+          <div>TOKEN = "{token}"</div>
           <form id="payment-form">
             <div id="card-container"></div>
             <button id="card-button" type="button">
