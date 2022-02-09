@@ -5,6 +5,7 @@ import { url, locationId, appId } from "./config/credentials";
 export const Form = () => {
   const [card, setCard] = useState({});
   const [amount, setAmount] = useState(1);
+  const [token, setToken] = useState("");
 
   const status = useExternalScript(url);
 
@@ -76,6 +77,8 @@ export const Form = () => {
       // disable the submit button as we await tokenization and make a payment request.
       cardButton.disabled = true;
       const token = await tokenize(card);
+
+      setToken(token);
       const paymentResults = await createPayment(token);
       displayPaymentResults("SUCCESS");
 
@@ -126,6 +129,9 @@ export const Form = () => {
             Pay ${amount}.00
           </button>
           <div id="payment-status-container"></div>
+          <div>
+            Token: <h5>{token}</h5>
+          </div>
         </>
       )}
     </div>
