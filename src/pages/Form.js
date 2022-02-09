@@ -16,7 +16,6 @@ const Form = () => {
 
   async function initializeCard(payments) {
     const card = await payments.card();
-
     //most weird part ... lol
     await card.attach("#card-container");
 
