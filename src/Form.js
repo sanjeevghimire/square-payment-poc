@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useExternalScript } from "./hooks/useExternalScript";
-import { url, locationId, appId } from "./config/credentials";
+import { hostname,url, locationId, appId } from "./config/credentials";
+
+
 
 export const Form = () => {
   const [card, setCard] = useState({});
@@ -32,10 +34,11 @@ export const Form = () => {
   const createPayment = async (token) => {
     const body = JSON.stringify({
       locationId,
-      sourceId: token,
+      token: token,
+      amount: amount
     });
 
-    const paymentResponse = await fetch("/payment", {
+    const paymentResponse = await fetch(hostname + "/payment/process-payment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,12 +59,11 @@ export const Form = () => {
     const statusContainer = document.getElementById("payment-status-container");
     if (status === "SUCCESS") {
       statusContainer.classList.remove("is-failure");
-      statusContainer.classList.add("is-success");
-    } else {
+      statusContainer.classList.add("is-success");         
+    } else {      
       statusContainer.classList.remove("is-success");
       statusContainer.classList.add("is-failure");
     }
-
     statusContainer.style.visibility = "visible";
   };
 
@@ -83,7 +85,7 @@ export const Form = () => {
       displayPaymentResults("SUCCESS");
 
       console.debug("Payment Success", paymentResults);
-    } catch (e) {
+    } catch (e) {      
       cardButton.disabled = false;
       displayPaymentResults("FAILURE");
       console.error(e.message);
@@ -124,13 +126,13 @@ export const Form = () => {
       {status === "loading" && <p>loading...</p>}
       {status === "ready" && (
         <>
+        <div style={{width:"500px",margin:"0 auto"}}>
+        <h2>Square Payments API</h2>
           <div id="card-container"></div>
           <button id="card-button" onClick={handleClick}>
-            Pay ${amount}.00
+            Pay {amount}.00
           </button>
           <div id="payment-status-container"></div>
-          <div>
-            Token: <h5>{token}</h5>
           </div>
         </>
       )}
